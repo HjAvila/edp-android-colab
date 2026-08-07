@@ -1,5 +1,3 @@
-package com.example.myapplication
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -7,11 +5,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 @Composable
 fun HomeScreen(
     onShowGreeting: (String) -> Unit
 ) {
+
     var name by remember {
         mutableStateOf("")
     }
@@ -20,6 +21,7 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(24.dp),
+
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -34,9 +36,7 @@ fun HomeScreen(
             }
         )
 
-        Spacer(
-            modifier = Modifier.height(16.dp)
-        )
+        Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             onClick = {
@@ -45,17 +45,21 @@ fun HomeScreen(
         ) {
             Text("Show Greeting")
         }
+
     }
+
 }
 
 @Composable
 fun GreetingScreen(
     userName: String
 ) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(24.dp),
+
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -64,5 +68,7 @@ fun GreetingScreen(
             text = "Hello, $userName! Welcome to Jetpack Navigation.",
             fontSize = 22.sp
         )
+
     }
+
 }
