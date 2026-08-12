@@ -1,199 +1,131 @@
 package com.example.myapplication
 
-import android.content.res.Configuration
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Class
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.School
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.ui.theme.ProfileTheme
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ProfileScreen() {
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text("My Profile")
-                }
-            )
-        }
-    ) { padding ->
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(24.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-            Box(
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary)
-                    .border(
-                        width = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        shape = CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-
-                Text(
-                    text = "HA",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "HANS JERALD A. AVILA",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "BS Information Technology | BSIT 3-2",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.secondary
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-            ) {
-
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-
-                    InfoRow(
-                        icon = Icons.Default.Person,
-                        label = "Full Name",
-                        value = "Hans Jerald A. Avila"
-                    )
-
-                    InfoRow(
-                        icon = Icons.Default.School,
-                        label = "Course",
-                        value = "Bachelor of Science in Information Technology"
-                    )
-
-                    InfoRow(
-                        icon = Icons.Default.Class,
-                        label = "Section",
-                        value = "BSIT 3-2"
-                    )
-
-                    InfoRow(
-                        icon = Icons.Default.Phone,
-                        label = "Mobile Number",
-                        value = "09XXXXXXXXX"
-                    )
-
-                    InfoRow(
-                        icon = Icons.Default.Email,
-                        label = "Email Address",
-                        value = "hjavila86122@liceo.edu.ph"
-                    )
-                }
-            }
-        }
-    }
-}
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-fun InfoRow(
-    icon: ImageVector,
-    label: String,
-    value: String
-) {
-
-    Row(
+fun ProfileForm(state: ProfileUiState, viewModel: ProfileViewModel) {
+    Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
     ) {
-
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            tint = MaterialTheme.colorScheme.primary
+        Text("My Profile", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(12.dp))
+        OutlinedTextField(
+            value = state.name,
+            onValueChange = { viewModel.onNameChange(it) },
+            label = { Text("Full name") },
+            modifier = Modifier.fillMaxWidth()
         )
-
-        Spacer(modifier = Modifier.width(16.dp))
-
-        Column(
-            modifier = Modifier.weight(1f)
+        OutlinedTextField(
+            value = state.email,
+            onValueChange = { viewModel.onEmailChange(it) },
+            label = { Text("Email") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        OutlinedTextField(
+            value = state.contactNumber,
+            onValueChange = { viewModel.onContactChange(it) },
+            label = { Text("Contact number") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        OutlinedTextField(
+            value = state.address,
+            onValueChange = { viewModel.onAddressChange(it) },
+            label = { Text("Address") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        OutlinedTextField(
+            value = state.username,
+            onValueChange = { viewModel.onUsernameChange(it) },
+            label = { Text("Username") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(Modifier.height(16.dp))
+        Text("Skills", fontWeight = FontWeight.Bold)
+        // Type a skill + Add button
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            OutlinedTextField(
+                value = state.newSkill,
+                onValueChange = { viewModel.onNewSkillChange(it) },
+                label = { Text("Add a skill") },
+                modifier = Modifier.weight(1f)
+            )
+            Spacer(Modifier.width(8.dp))
+            Button(onClick = { viewModel.addSkill() }) {
+                Text("Add")
+            }
+        }
+        // One row per skill, each with a Remove button
+        state.skills.forEach { skill ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("• $skill", modifier = Modifier.weight(1f))
+                TextButton(onClick = { viewModel.removeSkill(skill) }) {
+                    Text("Remove")
+                }
+            }
+        }
+        Spacer(Modifier.height(20.dp))
+        Button(
+            onClick = { viewModel.showPreview() },
+            modifier = Modifier.fillMaxWidth()
         ) {
-
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Text(
-                text = value,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            Text("Preview")
         }
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun LightPreview() {
-    ProfileTheme(darkTheme = false) {
-        Surface(
-            color = MaterialTheme.colorScheme.background
-        ) {
-            ProfileScreen()
+fun ProfilePreview(state: ProfileUiState, onBack: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
+        Text("Profile Preview", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(12.dp))
+        Text("Name: ${state.name}")
+        Text("Email: ${state.email}")
+        Text("Contact: ${state.contactNumber}")
+        Text("Address: ${state.address}")
+        Text("Username: ${state.username}")
+        Spacer(Modifier.height(8.dp))
+        Text("Skills:", fontWeight = FontWeight.Bold)
+        if (state.skills.isEmpty()) {
+            Text("No skills added yet.")
+        } else {
+            state.skills.forEach { skill -> Text("• $skill") }
+        }
+        Spacer(Modifier.height(20.dp))
+        OutlinedButton(onClick = onBack) {
+            Text("Back to edit")
         }
     }
 }
 
-@Preview(
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-)
 @Composable
-fun DarkPreview() {
-    ProfileTheme(darkTheme = true) {
-        Surface(
-            color = MaterialTheme.colorScheme.background
-        ) {
-            ProfileScreen()
-        }
+fun ProfileScreen(viewModel: ProfileViewModel = viewModel()) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    if (state.isPreview) {
+        ProfilePreview(state = state, onBack = { viewModel.backToEdit() })
+    } else {
+        ProfileForm(state = state, viewModel = viewModel)
     }
 }
