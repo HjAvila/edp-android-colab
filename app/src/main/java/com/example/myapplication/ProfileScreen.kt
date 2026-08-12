@@ -1,92 +1,160 @@
 package com.example.myapplication
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProfileScreen(viewModel: ProfileViewModel = viewModel()) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { 
+                    Text(
+                        if (state.isPreview) "Profile Preview" else "Edit Profile",
+                        fontWeight = FontWeight.Bold
+                    ) 
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            )
+        }
+    ) { padding ->
+        Box(modifier = Modifier.padding(padding)) {
+            if (state.isPreview) {
+                ProfilePreview(state = state, onBack = { viewModel.backToEdit() })
+            } else {
+                ProfileForm(state = state, viewModel = viewModel)
+            }
+        }
+    }
+}
 
 @Composable
 fun ProfileForm(state: ProfileUiState, viewModel: ProfileViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState())
+            .padding(20.dp)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text("My Profile", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-        Spacer(Modifier.height(12.dp))
-        OutlinedTextField(
+        ProfileInputField(
             value = state.name,
-            onValueChange = { viewModel.onNameChange(it) },
-            label = { Text("Full name") },
-            modifier = Modifier.fillMaxWidth()
+            onValueChange = viewModel::onNameChange,
+            label = "Full Name",
+            icon = Icons.Default.Person
         )
-        OutlinedTextField(
+        ProfileInputField(
             value = state.email,
-            onValueChange = { viewModel.onEmailChange(it) },
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth()
+            onValueChange = viewModel::onEmailChange,
+            label = "Email Address",
+            icon = Icons.Default.Email
         )
-        OutlinedTextField(
+        ProfileInputField(
             value = state.contactNumber,
-            onValueChange = { viewModel.onContactChange(it) },
-            label = { Text("Contact number") },
-            modifier = Modifier.fillMaxWidth()
+            onValueChange = viewModel::onContactChange,
+            label = "Contact Number",
+            icon = Icons.Default.Phone
         )
-        OutlinedTextField(
+        ProfileInputField(
             value = state.address,
-            onValueChange = { viewModel.onAddressChange(it) },
-            label = { Text("Address") },
-            modifier = Modifier.fillMaxWidth()
+            onValueChange = viewModel::onAddressChange,
+            label = "Home Address",
+            icon = Icons.Default.Home
         )
-        OutlinedTextField(
+        ProfileInputField(
             value = state.username,
-            onValueChange = { viewModel.onUsernameChange(it) },
-            label = { Text("Username") },
-            modifier = Modifier.fillMaxWidth()
+            onValueChange = viewModel::onUsernameChange,
+            label = "Username",
+            icon = Icons.Default.Badge
         )
-        Spacer(Modifier.height(16.dp))
-        Text("Skills", fontWeight = FontWeight.Bold)
-        // Type a skill + Add button
-        Row(verticalAlignment = Alignment.CenterVertically) {
+
+        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+        Text("Professional Skills", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             OutlinedTextField(
                 value = state.newSkill,
-                onValueChange = { viewModel.onNewSkillChange(it) },
-                label = { Text("Add a skill") },
-                modifier = Modifier.weight(1f)
+                onValueChange = viewModel::onNewSkillChange,
+                label = { Text("Add Skill") },
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(12.dp)
             )
-            Spacer(Modifier.width(8.dp))
-            Button(onClick = { viewModel.addSkill() }) {
-                Text("Add")
-            }
-        }
-        // One row per skill, each with a Remove button
-        state.skills.forEach { skill ->
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+            FilledIconButton(
+                onClick = viewModel::addSkill,
+                modifier = Modifier.size(56.dp),
+                shape = RoundedCornerShape(12.dp)
             ) {
-                Text("• $skill", modifier = Modifier.weight(1f))
-                TextButton(onClick = { viewModel.removeSkill(skill) }) {
-                    Text("Remove")
-                }
+                Icon(Icons.Default.Add, contentDescription = "Add skill")
             }
         }
-        Spacer(Modifier.height(20.dp))
-        Button(
-            onClick = { viewModel.showPreview() },
-            modifier = Modifier.fillMaxWidth()
+
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text("Preview")
+            state.skills.forEach { skill ->
+                InputChip(
+                    selected = false,
+                    onClick = { },
+                    label = { Text(skill) },
+                    trailingIcon = {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = "Remove",
+                            modifier = Modifier
+                                .size(18.dp)
+                                .clickable { viewModel.removeSkill(skill) },
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    },
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+            }
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        Button(
+            onClick = viewModel::showPreview,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Icon(Icons.Default.Visibility, contentDescription = null)
+            Spacer(Modifier.width(8.dp))
+            Text("View Profile Preview", fontSize = 16.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -96,36 +164,140 @@ fun ProfilePreview(state: ProfileUiState, onBack: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState())
+            .padding(20.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Profile Preview", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-        Spacer(Modifier.height(12.dp))
-        Text("Name: ${state.name}")
-        Text("Email: ${state.email}")
-        Text("Contact: ${state.contactNumber}")
-        Text("Address: ${state.address}")
-        Text("Username: ${state.username}")
-        Spacer(Modifier.height(8.dp))
-        Text("Skills:", fontWeight = FontWeight.Bold)
-        if (state.skills.isEmpty()) {
-            Text("No skills added yet.")
-        } else {
-            state.skills.forEach { skill -> Text("• $skill") }
+        Box(
+            modifier = Modifier
+                .size(100.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primaryContainer),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                Icons.Default.Person,
+                contentDescription = null,
+                modifier = Modifier.size(60.dp),
+                tint = MaterialTheme.colorScheme.onPrimaryContainer
+            )
         }
-        Spacer(Modifier.height(20.dp))
-        OutlinedButton(onClick = onBack) {
-            Text("Back to edit")
+
+        Spacer(Modifier.height(16.dp))
+
+        Text(
+            text = state.name.ifBlank { "N/A" },
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = "@${state.username.ifBlank { "username" }}",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.secondary
+        )
+
+        Spacer(Modifier.height(24.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                PreviewRow(icon = Icons.Default.Email, label = "Email", value = state.email)
+                PreviewRow(icon = Icons.Default.Phone, label = "Contact", value = state.contactNumber)
+                PreviewRow(icon = Icons.Default.Home, label = "Address", value = state.address)
+            }
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                "Skills & Expertise",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(Modifier.height(8.dp))
+            if (state.skills.isEmpty()) {
+                Text("No skills added yet.", style = MaterialTheme.typography.bodyMedium)
+            } else {
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    state.skills.forEach { skill ->
+                        SuggestionChip(
+                            onClick = { },
+                            label = { Text(skill) }
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(Modifier.height(40.dp))
+
+        OutlinedButton(
+            onClick = onBack,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Icon(Icons.Default.Edit, contentDescription = null)
+            Spacer(Modifier.width(8.dp))
+            Text("Back to Editing", fontWeight = FontWeight.Bold)
         }
     }
 }
 
 @Composable
-fun ProfileScreen(viewModel: ProfileViewModel = viewModel()) {
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
-    if (state.isPreview) {
-        ProfilePreview(state = state, onBack = { viewModel.backToEdit() })
-    } else {
-        ProfileForm(state = state, viewModel = viewModel)
+fun ProfileInputField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    icon: ImageVector
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        leadingIcon = { Icon(icon, contentDescription = null) },
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        singleLine = true
+    )
+}
+
+@Composable
+fun PreviewRow(icon: ImageVector, label: String, value: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+        Column {
+            Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.secondary)
+            Text(value.ifBlank { "Not provided" }, style = MaterialTheme.typography.bodyLarge)
+        }
     }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun FlowRow(
+    modifier: Modifier = Modifier,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    content: @Composable () -> Unit
+) {
+    androidx.compose.foundation.layout.FlowRow(
+        modifier = modifier,
+        horizontalArrangement = horizontalArrangement,
+        verticalArrangement = verticalArrangement,
+        content = { content() }
+    )
 }
