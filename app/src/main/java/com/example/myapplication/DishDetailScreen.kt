@@ -16,7 +16,6 @@ fun DishDetailScreen(
     viewModel: DishViewModel,
     onBack: () -> Unit
 ) {
-    // GIVEN: find the dish this screen is about.
     val dishes by viewModel.dishes.collectAsStateWithLifecycle()
     val dish = dishes.find { it.id == dishId }
     if (dish == null) {
@@ -24,7 +23,6 @@ fun DishDetailScreen(
         return
     }
 
-    // GIVEN: local UI state.
     var newStep by remember { mutableStateOf("") }
     var stepBeingEdited by remember { mutableStateOf<Recipe?>(null) }
 
@@ -34,13 +32,6 @@ fun DishDetailScreen(
         Text("Recipe steps", style = MaterialTheme.typography.bodyMedium)
         Spacer(Modifier.height(12.dp))
 
-        // TODO 9 (6 pts) -- CREATE
-        // Build a Row containing:
-        // * an OutlinedTextField bound to newStep (value = ..., onValueChange = ...)
-        // with label { Text("New step") } and Modifier.weight(1f)
-        // * a Button whose onClick calls viewModel.addRecipe(dishId, newStep)
-        // and then sets newStep = ""
-        // Copy the "CREATE (given)" Row from DishListScreen and rename things.
         Row(verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(
                 value = newStep,
@@ -58,14 +49,6 @@ fun DishDetailScreen(
 
         Spacer(Modifier.height(16.dp))
 
-        // TODO 10 (10 pts) -- READ + DELETE
-        // Build a LazyColumn that lists dish.recipes.
-        // Use: itemsIndexed(items = dish.recipes, key = { _, r -> r.id }) { index, recipe -> ... }
-        // Each row must show:
-        // * the step number and text, e.g. Text("${index + 1}. ${recipe.text}")
-        // inside Modifier.weight(1f)
-        // * a TextButton "Edit" -> stepBeingEdited = recipe
-        // * a TextButton "Delete" -> viewModel.deleteRecipe(dishId, recipe.id)
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             itemsIndexed(items = dish.recipes, key = { _, r -> r.id }) { index, recipe ->
                 Card(modifier = Modifier.fillMaxWidth()) {
@@ -82,10 +65,6 @@ fun DishDetailScreen(
         }
     }
 
-    // TODO 11 (4 pts) -- UPDATE
-    // Copy the dialog block from DishListScreen. When the user taps Save,
-    // call viewModel.updateRecipe(dishId, <the edited step's id>, newText)
-    // and then set stepBeingEdited = null.
     val editing = stepBeingEdited
     if (editing != null) {
         EditDialog(

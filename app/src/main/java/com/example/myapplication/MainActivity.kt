@@ -14,7 +14,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MaterialTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    RecipeApp() // <-- our whole app starts here
+                    RecipeApp()
                 }
             }
         }

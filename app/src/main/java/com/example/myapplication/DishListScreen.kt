@@ -16,10 +16,7 @@ fun DishListScreen(
     viewModel: DishViewModel,
     onDishClick: (Int) -> Unit
 ) {
-    // State flows DOWN from the ViewModel into this screen.
     val dishes by viewModel.dishes.collectAsStateWithLifecycle()
-
-    // Local UI state: what is currently typed, and which dish is being renamed.
     var newDishName by remember { mutableStateOf("") }
     var dishBeingEdited by remember { mutableStateOf<Dish?>(null) }
 
@@ -27,7 +24,6 @@ fun DishListScreen(
         Text("My Dishes", style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(12.dp))
 
-        // ---------- CREATE (given) ----------
         Row(verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(
                 value = newDishName,
@@ -39,19 +35,18 @@ fun DishListScreen(
             Spacer(Modifier.width(8.dp))
             Button(onClick = {
                 viewModel.addDish(newDishName)
-                newDishName = "" // clear the box after adding
+                newDishName = ""
             }) { Text("Add") }
         }
 
         Spacer(Modifier.height(16.dp))
 
-        // ---------- READ (given) ----------
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             items(items = dishes, key = { it.id }) { dish ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onDishClick(dish.id) } // opens Screen 2
+                        .clickable { onDishClick(dish.id) }
                 ) {
                     Row(
                         modifier = Modifier.padding(12.dp),
@@ -65,25 +60,19 @@ fun DishListScreen(
                             )
                         }
                         TextButton(onClick = { dishBeingEdited = dish }) { Text("Edit") }
-                        TextButton(onClick = {
-                            // TODO 7 (10 pts): delete THIS dish through the ViewModel.
-                            viewModel.deleteDish(dish.id)
-                        }) { Text("Delete") }
+                        TextButton(onClick = { viewModel.deleteDish(dish.id) }) { Text("Delete") }
                     }
                 }
             }
         }
     }
 
-    // ---------- UPDATE dialog ----------
     val editing = dishBeingEdited
     if (editing != null) {
         EditDialog(
             title = "Rename dish",
             initialText = editing.name,
             onConfirm = { newName ->
-                // TODO 8 (15 pts): rename this dish through the ViewModel,
-                // then close the dialog by setting dishBeingEdited = null.
                 viewModel.updateDish(editing.id, newName)
                 dishBeingEdited = null
             },
@@ -92,7 +81,6 @@ fun DishListScreen(
     }
 }
 
-// ---------- Reusable dialog: GIVEN, use it on BOTH screens ----------
 @Composable
 fun EditDialog(
     title: String,
