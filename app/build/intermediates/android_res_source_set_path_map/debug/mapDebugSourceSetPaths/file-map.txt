@@ -1,0 +1,8 @@
+com.example.myapplication.app-pngs-0 D:\edp-android-colab-avila\app\build\generated\res\pngs\debug
+com.example.myapplication.app-updated_navigation_xml-1 D:\edp-android-colab-avila\app\build\generated\updated_navigation_xml\debug
+com.example.myapplication.app-packageDebugResources-2 D:\edp-android-colab-avila\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+com.example.myapplication.app-packageDebugResources-3 D:\edp-android-colab-avila\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+com.example.myapplication.app-debug-4 D:\edp-android-colab-avila\app\build\intermediates\merged_res\debug\mergeDebugResources
+com.example.myapplication.app-debug-5 D:\edp-android-colab-avila\app\src\debug\res
+com.example.myapplication.app-main-6 D:\edp-android-colab-avila\app\src\main\res
+gradleHome-0 C:\Users\ADMIN\.gradle
