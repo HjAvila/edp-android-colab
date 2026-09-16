@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: androidx.compose.ui:ui-geometry-android:1.10.4@aar" external-system-id="GRADLE">
     <CLASSES>
-      <root url="file://$USER_HOME$/.gradle/caches/9.4.1/transforms/d0f79103321e0a4e6046318c7e0f6a4a/transformed/ui-geometry/AndroidManifest.xml" />
-      <root url="jar://$USER_HOME$/.gradle/caches/9.4.1/transforms/d0f79103321e0a4e6046318c7e0f6a4a/transformed/ui-geometry/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/9.4.1/transforms/251c7f89b00f78725b85ab4ce25c4112/transformed/ui-geometry/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/9.4.1/transforms/251c7f89b00f78725b85ab4ce25c4112/transformed/ui-geometry/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
